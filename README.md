@@ -1,7 +1,7 @@
 # Transiever Scoop Bucket
 
-[![CI](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/ci.yml/badge.svg)](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/ci.yml)
-[![Excavator](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/excavator.yml/badge.svg)](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/excavator.yml)
+![CI](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/ci.yml/badge.svg)
+![Excavator](https://github.com/SeWieland/Transiever.ScoopBucket/actions/workflows/excavator.yml/badge.svg)
 
 Scoop manifests for the Transiever command-line tools.
 
