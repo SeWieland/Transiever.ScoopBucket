@@ -32,6 +32,7 @@ Do not add credentials, installer side effects, or source-repository build logic
 .\bin\test.ps1
 .\bin\checkver.ps1 msieve
 .\bin\checkver.ps1 srtx
+.\bin\checkver.ps1 olrx
 ```
 
 Also install each changed manifest through a temporary local bucket and run the CLI with `--help`.

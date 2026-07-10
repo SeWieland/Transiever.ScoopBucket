@@ -18,12 +18,14 @@ Install the CLI you need:
 ```powershell
 scoop install transiever/msieve
 scoop install transiever/srtx
+scoop install transiever/olrx
 ```
 
 | Manifest | CLI | Platforms |
 | --- | --- | --- |
 | `msieve` | Direct ManageSieve protocol operations | Windows x64 and x86 |
 | `srtx` | Rule inspection, optimization, Sieve generation, and deployment | Windows x64 and x86 |
+| `olrx` | Classic Outlook rule export and server synchronization | Windows x64 |
 
 The manifests install self-contained release assets, so a separate .NET runtime is not required.
 
