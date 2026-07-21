@@ -29,4 +29,4 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           gh pr review --approve "$PR_URL"
-          gh pr merge --auto --squash --subject "chore(deps): $PR_TITLE" "$PR_URL"
+          gh pr merge --auto --squash --subject "$PR_TITLE" "$PR_URL"
