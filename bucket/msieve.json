@@ -1,16 +1,16 @@
 {
-    "version": "1.0.1",
+    "version": "1.1.1",
     "description": "Policy-neutral CLI for direct ManageSieve protocol operations",
     "homepage": "https://github.com/SeWieland/Transiever.ManageSieve",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.0.1/msieve-v1.0.1-win-x64.zip",
-            "hash": "7a3984e4bd513d952f6a6cd39a2676906dc69e97bb55ce711b1fb8c21c947613"
+            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.1.1/msieve-v1.1.1-win-x64.zip",
+            "hash": "0c700ff55ba553761cb06843f3783da0dc4213822c18c0bfae61f9d7440d7bb7"
         },
         "32bit": {
-            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.0.1/msieve-v1.0.1-win-x86.zip",
-            "hash": "9e0dce7f3caee5c13118bf15b9bdf4f7d57149d8fb367e1044e5471728ed638e"
+            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.1.1/msieve-v1.1.1-win-x86.zip",
+            "hash": "df5df9c349cebe6711884007db5661bab1afc83e889f187590a47d909087bcc0"
         }
     },
     "bin": "msieve.exe",
