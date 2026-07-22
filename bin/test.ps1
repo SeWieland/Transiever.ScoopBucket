@@ -12,4 +12,10 @@ $pesterConfig = New-PesterConfiguration -Hashtable @{
     }
 }
 $result = Invoke-Pester -Configuration $pesterConfig
-exit $result.FailedCount
+$failureCount = $result.FailedCount
+foreach ($property in 'FailedBlocksCount', 'FailedContainersCount') {
+    if ($result.PSObject.Properties.Name -contains $property) {
+        $failureCount += $result.$property
+    }
+}
+exit [Math]::Min($failureCount, 255)

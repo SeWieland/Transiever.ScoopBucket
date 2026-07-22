@@ -41,7 +41,10 @@ jobs:
       - name: Install and cache test dependencies
         uses: potatoqualitee/psmodulecache@9e4b63833c22c1768d648e115a9c849afdda22a5 # v6.3
         with:
-          modules-to-cache: BuildHelpers, Pester
+          # Temporary Pester 5 pin; remove after Scoop's test harness supports Pester 6.
+          # Tracking: https://github.com/SeWieland/Transiever.ScoopBucket/issues/4
+          # Upstream: https://github.com/ScoopInstaller/Scoop/issues/6693
+          modules-to-cache: BuildHelpers, Pester:5.9.0
           shell: ${{ matrix.shell }}
       - name: Run tests
         run: |
