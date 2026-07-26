@@ -24,10 +24,10 @@ scoop install transiever/tbrx
 
 | Manifest | CLI                                                             | Platforms           |
 | -------- | --------------------------------------------------------------- | ------------------- |
-| `msieve` | Direct ManageSieve protocol operations                          | Windows x64 and x86 |
-| `srtx`   | Rule inspection, optimization, Sieve generation, and deployment | Windows x64 and x86 |
-| `olrx`   | Classic Outlook rule export and server synchronization          | Windows x64         |
-| `tbrx`   | Experimental Thunderbird filter export and synchronization      | Windows x64         |
+| `msieve` | ManageSieve client to list, download, upload, and activate Sieve scripts | Windows x64 and x86 |
+| `srtx`   | Create Sieve scripts from rule files; inspect, optimize, preview, and deploy | Windows x64 and x86 |
+| `olrx`   | Export classic Outlook rules for Sieve generation or server synchronization | Windows x64         |
+| `tbrx`   | Experimental Thunderbird filter export for Sieve generation and server sync | Windows x64         |
 
 The manifests install self-contained release assets, so a separate .NET runtime is not required.
 
