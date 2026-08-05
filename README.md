@@ -33,7 +33,8 @@ The manifests install self-contained release assets, so a separate .NET runtime 
 
 ## Updates
 
-Scoop's Excavator checks stable upstream GitHub releases every four hours and updates manifest versions and hashes.
+Scoop's Excavator checks stable upstream GitHub releases every four hours and opens a manifest update pull request when it finds a new version.
+The pull request is validated and merged automatically when it changes one supported manifest and the required checks pass.
 Beta prereleases are intentionally excluded except for the unstable `tbrx` beta.
 `tbrx` temporarily tracks prereleases under its permanent name and actively requests [redacted tester reports](https://github.com/SeWieland/Transiever.ThunderbirdResiever/issues).
 

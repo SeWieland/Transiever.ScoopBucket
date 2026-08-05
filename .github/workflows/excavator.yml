@@ -7,7 +7,8 @@ on:
     - cron: '20 */4 * * *'
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: read
 
 jobs:
   excavate:
@@ -16,8 +17,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Excavate
-        uses: ScoopInstaller/GithubActions@main
+        with:
+          token: ${{ secrets.SCOOP_BOT_TOKEN }}
+
+      - name: Install Scoop and hub
+        shell: pwsh
+        run: |
+          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+          scoop install hub
+
+      - name: Create manifest update pull requests
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SKIP_UPDATED: 1
+          GITHUB_TOKEN: ${{ secrets.SCOOP_BOT_TOKEN }}
+        run: |
+          $env:SCOOP_HOME = Convert-Path (scoop prefix scoop)
+          git config user.name "Transiever Scoop Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream "https://github.com/$env:GITHUB_REPOSITORY.git"
+          .\bin\auto-pr.ps1 -Request -OriginBranch main -SkipUpdated

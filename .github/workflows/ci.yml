@@ -50,3 +50,38 @@ jobs:
         run: |
           $env:SCOOP_HOME="$(Convert-Path '.\scoop_core')"
           .\my_bucket\bin\test.ps1
+
+  auto-merge-manifest-update:
+    name: Enable auto-merge for manifest update
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.head_ref, 'manifest/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Verify and enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          body="$(gh pr view "$PR_URL" --json body --jq .body)"
+          if [[ "$body" != *"Hello lovely humans,"* || "$body" != *"a new version of ["* ]]; then
+            echo "Skipping $PR_URL: it was not created by the manifest updater."
+            exit 0
+          fi
+
+          files="$(gh pr diff "$PR_URL" --name-only)"
+          case "$files" in
+            bucket/msieve.json|bucket/srtx.json|bucket/olrx.json|bucket/tbrx.json) ;;
+            *)
+              echo "Skipping $PR_URL: it is not a single known manifest update."
+              exit 0
+              ;;
+          esac
+
+          gh pr merge --auto --squash --subject "$PR_TITLE" "$PR_URL"
