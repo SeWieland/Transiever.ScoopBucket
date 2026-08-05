@@ -25,13 +25,16 @@ jobs:
         run: |
           Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
           scoop install hub
+          $scoopRoot = Join-Path $env:USERPROFILE 'scoop'
+          (Join-Path $scoopRoot 'shims') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "SCOOP_HOME=$(Join-Path $scoopRoot 'apps\scoop\current')" |
+            Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Create manifest update pull requests
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.SCOOP_BOT_TOKEN }}
         run: |
-          $env:SCOOP_HOME = Convert-Path (scoop prefix scoop)
           git config user.name "Transiever Scoop Bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream "https://github.com/$env:GITHUB_REPOSITORY.git"
