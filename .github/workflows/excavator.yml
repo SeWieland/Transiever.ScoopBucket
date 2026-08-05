@@ -28,18 +28,11 @@ jobs:
           "SCOOP_HOME=$(Join-Path $scoopRoot 'apps\scoop\current')" |
             Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Create manifest update pull requests
+      - name: Update manifests
         shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.SCOOP_BOT_TOKEN }}
         run: |
-          git config user.name "Transiever Scoop Bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           .\bin\checkver.ps1 -Update -SkipUpdated
 
-          $manifests = @(git diff --name-only -- bucket | Where-Object {
-            $_ -match '^bucket/(msieve|srtx|olrx|tbrx)\.json$'
-          })
           $unexpectedChanges = @(git diff --name-only | Where-Object {
             $_ -notmatch '^bucket/(msieve|srtx|olrx|tbrx)\.json$'
           })
@@ -47,29 +40,19 @@ jobs:
             throw "The updater changed unsupported files: $($unexpectedChanges -join ', ')"
           }
 
-          foreach ($manifest in $manifests) {
-            $app = [System.IO.Path]::GetFileNameWithoutExtension($manifest)
-            $version = (Get-Content -Raw $manifest | ConvertFrom-Json).version
-            $branch = "manifest/$app-$version"
-            $title = "$app: Update to version $version"
+      - name: Create or update manifest update pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.SCOOP_BOT_TOKEN }}
+          branch: automation/scoop-manifest-updates
+          delete-branch: true
+          commit-message: 'chore: update Scoop manifests'
+          committer: 'Transiever Scoop Bot <41898282+github-actions[bot]@users.noreply.github.com>'
+          author: 'Transiever Scoop Bot <41898282+github-actions[bot]@users.noreply.github.com>'
+          title: 'chore: update Scoop manifests'
+          body: |
+            Automated Scoop manifest update.
 
-            git ls-remote --exit-code --heads origin $branch *> $null
-            if ($LASTEXITCODE -eq 0) {
-              Write-Host "Skipping $app: $branch already exists."
-              git restore --staged --worktree $manifest
-              continue
-            }
-
-            git switch -c $branch
-            git add $manifest
-            git commit -m $title
-            git push origin $branch
-
-            $body = @"
-Automated Scoop manifest update.
-
-Created by Transiever Scoop Excavator.
-"@
-            gh pr create --base main --head $branch --title $title --body $body
-            git switch main
-          }
+            Created by Transiever Scoop Excavator.
+          add-paths: |
+            bucket/*.json
