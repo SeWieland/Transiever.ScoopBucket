@@ -20,13 +20,11 @@ jobs:
         with:
           token: ${{ secrets.SCOOP_BOT_TOKEN }}
 
-      - name: Install Scoop and hub
+      - name: Install Scoop
         shell: pwsh
         run: |
           Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-          scoop install hub
           $scoopRoot = Join-Path $env:USERPROFILE 'scoop'
-          (Join-Path $scoopRoot 'shims') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "SCOOP_HOME=$(Join-Path $scoopRoot 'apps\scoop\current')" |
             Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -37,5 +35,41 @@ jobs:
         run: |
           git config user.name "Transiever Scoop Bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote add upstream "https://github.com/$env:GITHUB_REPOSITORY.git"
-          .\bin\auto-pr.ps1 -Request -OriginBranch main -SkipUpdated
+          .\bin\checkver.ps1 -Update -SkipUpdated
+
+          $manifests = @(git diff --name-only -- bucket | Where-Object {
+            $_ -match '^bucket/(msieve|srtx|olrx|tbrx)\.json$'
+          })
+          $unexpectedChanges = @(git diff --name-only | Where-Object {
+            $_ -notmatch '^bucket/(msieve|srtx|olrx|tbrx)\.json$'
+          })
+          if ($unexpectedChanges) {
+            throw "The updater changed unsupported files: $($unexpectedChanges -join ', ')"
+          }
+
+          foreach ($manifest in $manifests) {
+            $app = [System.IO.Path]::GetFileNameWithoutExtension($manifest)
+            $version = (Get-Content -Raw $manifest | ConvertFrom-Json).version
+            $branch = "manifest/$app-$version"
+            $title = "$app: Update to version $version"
+
+            git ls-remote --exit-code --heads origin $branch *> $null
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "Skipping $app: $branch already exists."
+              git restore --staged --worktree $manifest
+              continue
+            }
+
+            git switch -c $branch
+            git add $manifest
+            git commit -m $title
+            git push origin $branch
+
+            $body = @"
+Automated Scoop manifest update.
+
+Created by Transiever Scoop Excavator.
+"@
+            gh pr create --base main --head $branch --title $title --body $body
+            git switch main
+          }

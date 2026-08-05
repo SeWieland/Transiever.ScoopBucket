@@ -56,6 +56,7 @@ jobs:
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login == github.repository_owner &&
       startsWith(github.head_ref, 'manifest/')
     runs-on: ubuntu-latest
     permissions:
@@ -70,7 +71,7 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           body="$(gh pr view "$PR_URL" --json body --jq .body)"
-          if [[ "$body" != *"Hello lovely humans,"* || "$body" != *"a new version of ["* ]]; then
+          if [[ "$body" != *"Created by Transiever Scoop Excavator."* ]]; then
             echo "Skipping $PR_URL: it was not created by the manifest updater."
             exit 0
           fi
