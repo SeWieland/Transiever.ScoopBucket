@@ -56,7 +56,8 @@ jobs:
     if: >-
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.head_ref, 'manifest/')
+      github.event.pull_request.user.login == github.repository_owner &&
+      github.head_ref == 'automation/scoop-manifest-updates'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -70,18 +71,19 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           body="$(gh pr view "$PR_URL" --json body --jq .body)"
-          if [[ "$body" != *"Hello lovely humans,"* || "$body" != *"a new version of ["* ]]; then
+          if [[ "$body" != *"Created by Transiever Scoop Excavator."* ]]; then
             echo "Skipping $PR_URL: it was not created by the manifest updater."
             exit 0
           fi
 
-          files="$(gh pr diff "$PR_URL" --name-only)"
-          case "$files" in
-            bucket/msieve.json|bucket/srtx.json|bucket/olrx.json|bucket/tbrx.json) ;;
-            *)
-              echo "Skipping $PR_URL: it is not a single known manifest update."
-              exit 0
-              ;;
-          esac
+          while IFS= read -r file; do
+            case "$file" in
+              bucket/msieve.json|bucket/srtx.json|bucket/olrx.json|bucket/tbrx.json) ;;
+              *)
+                echo "Skipping $PR_URL: it changes an unsupported file: $file"
+                exit 0
+                ;;
+            esac
+          done < <(gh pr diff "$PR_URL" --name-only)
 
           gh pr merge --auto --squash --subject "$PR_TITLE" "$PR_URL"

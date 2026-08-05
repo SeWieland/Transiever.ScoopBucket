@@ -18,24 +18,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: main
           token: ${{ secrets.SCOOP_BOT_TOKEN }}
 
-      - name: Install Scoop and hub
+      - name: Install Scoop
         shell: pwsh
         run: |
           Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-          scoop install hub
           $scoopRoot = Join-Path $env:USERPROFILE 'scoop'
-          (Join-Path $scoopRoot 'shims') | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "SCOOP_HOME=$(Join-Path $scoopRoot 'apps\scoop\current')" |
             Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Create manifest update pull requests
+      - name: Update manifests
         shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.SCOOP_BOT_TOKEN }}
         run: |
-          git config user.name "Transiever Scoop Bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote add upstream "https://github.com/$env:GITHUB_REPOSITORY.git"
-          .\bin\auto-pr.ps1 -Request -OriginBranch main -SkipUpdated
+          .\bin\checkver.ps1 -Update -SkipUpdated
+
+          $unexpectedChanges = @(git diff --name-only | Where-Object {
+            $_ -notmatch '^bucket/(msieve|srtx|olrx|tbrx)\.json$'
+          })
+          if ($unexpectedChanges) {
+            throw "The updater changed unsupported files: $($unexpectedChanges -join ', ')"
+          }
+
+      - name: Create or update manifest update pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.SCOOP_BOT_TOKEN }}
+          branch: automation/scoop-manifest-updates
+          base: main
+          delete-branch: true
+          commit-message: 'chore: update Scoop manifests'
+          committer: 'Transiever Scoop Bot <41898282+github-actions[bot]@users.noreply.github.com>'
+          author: 'Transiever Scoop Bot <41898282+github-actions[bot]@users.noreply.github.com>'
+          title: 'chore: update Scoop manifests'
+          body: |
+            Automated Scoop manifest update.
+
+            Created by Transiever Scoop Excavator.
+          add-paths: |
+            bucket/*.json
