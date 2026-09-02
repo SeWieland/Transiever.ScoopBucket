@@ -1,16 +1,16 @@
 {
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "ManageSieve client to list, download, upload, and activate Sieve scripts",
     "homepage": "https://github.com/SeWieland/Transiever.ManageSieve",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.1.2/msieve-v1.1.2-win-x64.zip",
-            "hash": "daacec60c678c4a69cbd6c4fe6968297427a5d876d97eae80deb95831c6b1a3d"
+            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.2.0/msieve-v1.2.0-win-x64.zip",
+            "hash": "88809dae487c6841d7b9ce686505351d78ed1541b92da0d25c59f1ede71fdf5b"
         },
         "32bit": {
-            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.1.2/msieve-v1.1.2-win-x86.zip",
-            "hash": "75ecbadafee0e4bc93ee9f5e72b3cc670032b52df92c85dd4d330077b18e7ebc"
+            "url": "https://github.com/SeWieland/Transiever.ManageSieve/releases/download/v1.2.0/msieve-v1.2.0-win-x86.zip",
+            "hash": "e73aeb9c97d875da376726ff8e54d33a654c456981f016f1405a6bec43489aa6"
         }
     },
     "bin": "msieve.exe",
